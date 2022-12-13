@@ -1,0 +1,1 @@
+import{cj as r,ck as s,h as a}from"./a9ab9e9d.js";const c=r("app",()=>{const e=s("orderList",[]),t=o=>e.value=o;return{dataSource:a(()=>({list:e.value,total:e.value.length})),setOrderList:t,orderList:e}});export{c as u};
