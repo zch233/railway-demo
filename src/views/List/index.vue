@@ -1,7 +1,8 @@
 <script lang="jsx">
-import { GupoButton, GupoTag, gupoMessage } from '@src/components/UI';
+import { GupoButton, GupoTag, gupoMessage, GupoDropdownButton, GupoMenu, GupoMenuItem, GupoModal } from '@src/components/UI';
 import { useLocalStorage } from '@src/utils/storage';
 import ModalImport from '@src/views/List/ModalImport.vue';
+import ModalImportTemp from '@src/views/List/ModalImportTemp.vue';
 import ModalOrder from '@src/views/List/ModalOrder.vue';
 import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
@@ -9,6 +10,7 @@ dayjs.extend(isBetween);
 import ModalExport from '@src/views/List/ModalExport.vue';
 import { getStatus, beginCars } from '@src/views/List/utils';
 import GlobalIcon from '@src/components/GlobalIcon';
+import { CloudUploadOutlined } from '@ant-design/icons-vue';
 
 const initFormData = () => ({
     time: dayjs().add(1, 'day').format('YYYY-MM-DD'),
@@ -19,6 +21,7 @@ export default defineComponent({
     setup() {
         const $globalTable = ref();
         const $modalImport = ref();
+        const $modalImportTemp = ref();
         const $modalOrder = ref();
         const $modalExport = ref();
         const filterOptions = reactive(initFormData());
@@ -90,12 +93,34 @@ export default defineComponent({
                     ],
                 },
             },
+            {
+                key: 'custom_temp',
+                type: 'select',
+                props: {
+                    placeholder: '请选择是否始临客',
+                    showSearch: true,
+                    options: [
+                        { value: '1', label: '是' },
+                        { value: '0', label: '否' },
+                    ],
+                },
+            },
         ]);
         const places = useLocalStorage('places', []);
         const platforms = useLocalStorage('platforms', []);
         const ways = useLocalStorage('ways', []);
         const columns = useLocalStorage('columns', []);
         const dataSource = useLocalStorage('dataSource', { list: [], total: 0 });
+        const dataSourceTemp = useLocalStorage('dataSourceTemp', { list: [], total: 0 });
+        const dataSourceTotal = computed(() => {
+            const list = dataSourceTemp.value.list
+                .filter(v => dayjs(filterOptions.time).isBetween(dayjs(v.dateRange[0]).add(-1, 'day'), dayjs(v.dateRange[1]).add(1, 'day')))
+                .concat(dataSource.value.list);
+            return {
+                list,
+                total: list.length,
+            };
+        });
         const filterDataSource = ref();
         const selectedRowKeys = ref([]);
         return () => (
@@ -105,7 +130,7 @@ export default defineComponent({
                     itemConfigs={itemConfigs.value}
                     onSearch={e => {
                         Object.assign(filterOptions, e);
-                        let list = dataSource.value.list;
+                        let list = dataSourceTotal.value.list;
                         // 筛选办客站
                         if (e[1]) {
                             list = list.filter(v => v[1] === e[1]);
@@ -132,6 +157,9 @@ export default defineComponent({
                                 e['custom_begin'] === '1' ? beginCars.includes(v[3].split('-')[0]) : !beginCars.includes(v[3].split('-')[0])
                             );
                         }
+                        if (e['custom_temp']) {
+                            list = list.filter(v => v[0].toString().includes('-'));
+                        }
                         filterDataSource.value = {
                             list,
                             total: list.length,
@@ -144,32 +172,76 @@ export default defineComponent({
                     rowSelection={{ selectedRowKeys: selectedRowKeys.value, onChange: e => (selectedRowKeys.value = e) }}
                     onSelectedCancel={() => (selectedRowKeys.value = [])}
                     ref={$globalTable}
-                    columns={columns.value.concat([
-                        {
-                            key: 'custom_status',
-                            title: '状态',
-                            customRender: ({ record }) => {
-                                return getStatus(record, filterOptions.time) ? <GupoTag color='green'>正常</GupoTag> : <GupoTag color='red'>停运</GupoTag>;
+                    columns={columns.value
+                        .map(v => ({
+                            ...v,
+                            customRender: ({ text }) =>
+                                v.key === 0 ? (
+                                    <span
+                                        style='text-decoration: underline;cursor: pointer;'
+                                        onClick={() => {
+                                            GupoModal.confirm({
+                                                title: '提示',
+                                                content: '确认要删除吗？',
+                                                onOk: () => {
+                                                    const list = dataSourceTemp.value.list.filter(v => v[0] !== text);
+                                                    dataSourceTemp.value = {
+                                                        list,
+                                                        total: list.length,
+                                                    };
+                                                    $globalTable.value.refresh();
+                                                },
+                                            });
+                                        }}
+                                    >
+                                        {text}
+                                    </span>
+                                ) : (
+                                    text
+                                ),
+                        }))
+                        .concat([
+                            {
+                                key: 'custom_status',
+                                title: '状态',
+                                customRender: ({ record }) => {
+                                    return getStatus(record, filterOptions.time) ? <GupoTag color='green'>正常</GupoTag> : <GupoTag color='red'>停运</GupoTag>;
+                                },
                             },
-                        },
-                        {
-                            key: 'custom_begin',
-                            title: '始发车',
-                            customRender: ({ record }) => {
-                                return beginCars.includes(record[3].split('-')[0]) ? <GlobalIcon style='font-size: 20px;color:#389e0d;' name='begin' /> : '-';
+                            {
+                                key: 'custom_begin',
+                                title: '始发车',
+                                customRender: ({ record }) => {
+                                    return beginCars.includes(record[3].split('-')[0]) ? (
+                                        <GlobalIcon style='font-size: 20px;color:#389e0d;' name='begin' />
+                                    ) : (
+                                        '-'
+                                    );
+                                },
                             },
-                        },
-                    ])}
-                    listApi={async () => ({ data: filterDataSource.value || dataSource.value })}
+                        ])}
+                    listApi={async () => ({ data: filterDataSource.value || dataSourceTotal.value })}
                     operationRender={() => (
                         <>
-                            <GupoButton type='primary' onClick={() => $modalImport.value.showModal()}>
-                                导入
-                            </GupoButton>
+                            <GupoDropdownButton onClick={() => $modalImport.value.showModal()} class='importGroup'>
+                                {{
+                                    default: () => '导入',
+                                    overlay: () => (
+                                        <GupoMenu>
+                                            {[{ key: 'temp', text: '临客', click: () => $modalImportTemp.value.showModal() }].map(item => (
+                                                <GupoMenuItem key={item.key} onClick={item.click}>
+                                                    <CloudUploadOutlined />
+                                                    <span> {item.text}</span>
+                                                </GupoMenuItem>
+                                            ))}
+                                        </GupoMenu>
+                                    ),
+                                }}
+                            </GupoDropdownButton>
                             <GupoButton
                                 type='primary'
                                 onClick={() => {
-                                    const data = filterDataSource.value || dataSource.value;
+                                    const data = filterDataSource.value || dataSourceTotal.value;
                                     if (data.list.length === 0) {
                                         gupoMessage.error('无效数据');
                                         return;
@@ -201,6 +273,17 @@ export default defineComponent({
                     onUpdatePlatforms={e => (platforms.value = e)}
                     onUpdateWays={e => (ways.value = e)}
                 />
+                <ModalImportTemp
+                    ref={$modalImportTemp}
+                    onSuccess={() => $globalTable.value.refresh()}
+                    onUpdateDataSourceTemp={e => {
+                        const list = e.list.concat(dataSourceTemp.value.list);
+                        dataSourceTemp.value = {
+                            list,
+                            total: list.length,
+                        };
+                    }}
+                />
                 <ModalOrder
                     ref={$modalOrder}
                     onSuccess={() => {
@@ -214,3 +297,9 @@ export default defineComponent({
     },
 });
 </script>
+
+<style lang="less">
+.importGroup {
+    margin-right: 8px;
+}
+</style>

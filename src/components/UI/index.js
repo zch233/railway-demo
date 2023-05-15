@@ -37,4 +37,5 @@ export {
     ConfigProvider as GupoConfigProvider,
     Modal as GupoModal,
     Tag as GupoTag,
+    DropdownButton as GupoDropdownButton,
 } from 'ant-design-vue';

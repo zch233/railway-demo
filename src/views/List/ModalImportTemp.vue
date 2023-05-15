@@ -7,8 +7,8 @@ import { InboxOutlined } from '@ant-design/icons-vue';
 import { useStoreApp } from '@src/store/modules/app';
 
 export default defineComponent({
-    name: 'ModalImport',
-    emits: ['updateColumns', 'updateDataSource', 'updatePlaces', 'updateWays', 'success'],
+    name: 'ModalImportTemp',
+    emits: ['updateDataSourceTemp', 'success'],
     expose: ['showModal'],
     setup(props, context) {
         const appStore = useStoreApp();
@@ -18,6 +18,7 @@ export default defineComponent({
             formData: {
                 file: [],
                 clear: '0',
+                date: [],
             },
         });
         const handelOk = () => {
@@ -27,25 +28,24 @@ export default defineComponent({
                 const bytes = new Uint8Array(e.target.result);
                 const wb = XLSX.read(bytes, { cellDates: true });
                 const data = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, range: 1 });
-                context.emit(
-                    'updateColumns',
-                    data[0].map((title, key) => ({ key, title }))
-                );
+                const key = Date.now();
                 const list = data
                     .slice(1)
                     .filter(v => v.length)
                     .map(arr => {
                         const item = arr.reduce((res, cur, index) => {
-                            res[index] = typeof cur === 'object' ? dayjs(cur).format('HH:mm') : cur;
+                            if (index === 0) {
+                                res[index] = key + '-' + cur;
+                            } else {
+                                res[index] = typeof cur === 'object' ? dayjs(cur).format('HH:mm') : cur;
+                            }
                             return res;
                         }, {});
                         item.status = '1';
+                        item.dateRange = modal.formData.date;
                         return item;
                     });
-                context.emit('updateDataSource', { list, total: list.length });
-                context.emit('updatePlaces', [...new Set(list.map(v => v[1]))]);
-                context.emit('updatePlatforms', [...new Set(list.map(v => v[6]))]);
-                context.emit('updateWays', [...new Set(list.map(v => v[7]))]);
+                context.emit('updateDataSourceTemp', { list, total: list.length });
                 context.emit('success');
                 modal.visible = false;
                 gupoMessage.success('导入成功');
@@ -63,7 +63,7 @@ export default defineComponent({
                 onOk={handelOk}
                 onCancel={() => (modal.visible = false)}
                 confirmLoading={modal.loading}
-                title='导入'
+                title='临客导入'
             >
                 <GlobalFormItem
                     labelCol={{ span: 0 }}
@@ -89,10 +89,23 @@ export default defineComponent({
                 <GlobalFormItem
                     labelCol={{ span: 0 }}
                     formData={modal.formData}
-                    onUpdate:formData={e => (modal.formData = e)}
+                    onUpdate:formData={e => (modal.formData.date = e.date)}
+                    item={{
+                        key: 'date',
+                        label: '生效日期',
+                        type: 'datePicker.rangePicker',
+                        props: {
+                            valueFormat: 'YYYY-MM-DD',
+                        },
+                    }}
+                />
+                <GlobalFormItem
+                    labelCol={{ span: 0 }}
+                    formData={modal.formData}
+                    onUpdate:formData={e => (modal.formData.clear = e.clear)}
                     item={{
                         key: 'clear',
-                        label: '是否清空调令',
+                        label: '是否清空旧的数据',
                         type: 'radio',
                         props: {
                             options: [
