@@ -21,7 +21,18 @@ export default defineComponent({
                 date: [],
             },
         });
+        const validate = () => {
+            if (!modal.formData.file?.length) {
+                gupoMessage.error('请上传文件');
+                throw '校验错误';
+            }
+            if (!modal.formData.date?.length) {
+                gupoMessage.error('请选择生效日期');
+                throw '校验错误';
+            }
+        };
         const handelOk = () => {
+            validate();
             const file = modal.formData.file[0];
             const reader = new FileReader();
             reader.onload = e => {
@@ -96,28 +107,6 @@ export default defineComponent({
                         type: 'datePicker.rangePicker',
                         props: {
                             valueFormat: 'YYYY-MM-DD',
-                        },
-                    }}
-                />
-                <GlobalFormItem
-                    labelCol={{ span: 0 }}
-                    formData={modal.formData}
-                    onUpdate:formData={e => (modal.formData.clear = e.clear)}
-                    item={{
-                        key: 'clear',
-                        label: '是否清空旧的数据',
-                        type: 'radio',
-                        props: {
-                            options: [
-                                {
-                                    label: '是的，我要清空',
-                                    value: '1',
-                                },
-                                {
-                                    label: '别，我暂时不想',
-                                    value: '0',
-                                },
-                            ],
                         },
                     }}
                 />

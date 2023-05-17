@@ -176,7 +176,7 @@ export default defineComponent({
                         .map(v => ({
                             ...v,
                             customRender: ({ text }) =>
-                                v.key === 0 ? (
+                                v.key === 0 && text.toString()?.includes('-') ? (
                                     <span
                                         style='text-decoration: underline;cursor: pointer;'
                                         onClick={() => {
@@ -194,7 +194,7 @@ export default defineComponent({
                                             });
                                         }}
                                     >
-                                        {text}
+                                        {dayjs(Number(text.split('-')[0])).format('YYYY-MM-DD HH:mm:ss')}-{text.split('-')[1]}
                                     </span>
                                 ) : (
                                     text
@@ -277,7 +277,7 @@ export default defineComponent({
                     ref={$modalImportTemp}
                     onSuccess={() => $globalTable.value.refresh()}
                     onUpdateDataSourceTemp={e => {
-                        const list = e.list.concat(dataSourceTemp.value.list);
+                        const list = e.list.concat(dataSourceTemp.value.list).filter(v => dayjs().isBefore(dayjs(v.dateRange[1])));
                         dataSourceTemp.value = {
                             list,
                             total: list.length,
