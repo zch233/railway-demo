@@ -58,7 +58,13 @@ const updateValue = data => {
 };
 
 const handleReset = () => {
-    updateValue(_defaultFormData);
+    updateValue({
+        ...props.itemConfigs.reduce((res, cur) => {
+            res[cur.key] = undefined;
+            return res;
+        }, {}),
+        ..._defaultFormData,
+    });
     emits('reset');
 };
 const handleSearch = () => {
