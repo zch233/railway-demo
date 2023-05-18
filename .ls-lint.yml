@@ -8,7 +8,7 @@
 ls:
     src/*:
         .js: kebab-case | PascalCase | camelCase
-        .jsx: kebab-case | PascalCase
+        .jsx: kebab-case | PascalCase | camelCase
         .vue: PascalCase | regex:^index
         .ts: camelCase | PascalCase
         .tsx: kebab-case | PascalCase
