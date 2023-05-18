@@ -82,6 +82,7 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    onChartClick: Function,
 });
 
 /**
@@ -243,6 +244,10 @@ onMounted(() => {
         getChart();
         clearTimeout(timer);
     });
+    setTimeout(() => {
+        props.onChartClick && myChart.on('click', params => props.onChartClick(params));
+    });
+
     window.addEventListener('resize', resize); // 添加监听
 });
 

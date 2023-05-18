@@ -6,12 +6,14 @@ import { getStatus, timeSlot, beginCars } from '@src/views/List/utils';
 import GlobalFormItem from '@src/components/GlobalForm/Item.vue';
 import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
+import ModalExportTable from '@src/views/List/ModalExportTable.vue';
 dayjs.extend(isBetween);
 
 export default defineComponent({
     name: 'ModalExport',
     expose: ['showModal'],
     setup() {
+        const $modalExportTable = ref();
         const modal = reactive({
             visible: false,
             loading: false,
@@ -32,8 +34,8 @@ export default defineComponent({
             params.value.data?.list.map(v => {
                 for (let i = 0; i < dateArr.length; i++) {
                     const section = [dateArr[i - 1] || '00:00', dateArr[i]];
-                    dataMap.value.normal[section.join('-')] = dataMap.value.normal[section.join('-')] || 0;
-                    dataMap.value.abnormal[section.join('-')] = dataMap.value.abnormal[section.join('-')] || 0;
+                    dataMap.value.normal[section.join('-')] = dataMap.value.normal[section.join('-')] || [];
+                    dataMap.value.abnormal[section.join('-')] = dataMap.value.abnormal[section.join('-')] || [];
                     if (
                         dayjs(`${params.value.filterOptions?.time} ${v[4] === '=' ? v[5] : v[4]}`).isBetween(
                             dayjs(`${params.value.filterOptions?.time} ${section[0]}`).add(-1, 'second'),
@@ -42,7 +44,7 @@ export default defineComponent({
                     ) {
                         const status = getStatus(v, params.value.filterOptions?.time);
                         v.typeDefinition = status ? '正常' : '停运';
-                        dataMap.value[status ? 'normal' : 'abnormal'][section.join('-')] += 1;
+                        dataMap.value[status ? 'normal' : 'abnormal'][section.join('-')].push(v);
                     }
                     v.beginDefinition = beginCars.includes(v[3].split('-')[0]) ? '是' : '否';
                 }
@@ -105,7 +107,7 @@ export default defineComponent({
                             emphasis: {
                                 focus: 'series',
                             },
-                            data: Object.values(dataMap.value.normal),
+                            data: Object.values(dataMap.value.normal).map(v => v.length),
                         },
                         {
                             name: '停运',
@@ -118,7 +120,7 @@ export default defineComponent({
                             emphasis: {
                                 focus: 'series',
                             },
-                            data: Object.values(dataMap.value.abnormal),
+                            data: Object.values(dataMap.value.abnormal).map(v => v.length),
                         },
                         {
                             name: '正常-折线',
@@ -131,7 +133,7 @@ export default defineComponent({
                             emphasis: {
                                 focus: 'series',
                             },
-                            data: Object.values(dataMap.value.normal),
+                            data: Object.values(dataMap.value.normal).map(v => v.length),
                         },
                     ],
                 },
@@ -153,7 +155,9 @@ export default defineComponent({
                 title={`今日统计(${params.value.filterOptions?.time})`}
             >
                 <GupoAlert
-                    message={`图定开行 ${params.value.data?.list.length} 趟，实际开行 ${Object.values(dataMap.value.normal).reduce((a, b) => a + b, 0)} 趟`}
+                    message={`图定开行 ${params.value.data?.list.length} 趟，实际开行 ${Object.values(dataMap.value.normal)
+                        .map(v => v.length)
+                        .reduce((a, b) => a + b, 0)} 趟`}
                     type='warning'
                     show-icon
                 />
@@ -174,7 +178,14 @@ export default defineComponent({
                         },
                     }}
                 />
-                <GupoCharts {...chartDataOption.value} />
+                <GupoCharts
+                    {...chartDataOption.value}
+                    onChartClick={e => {
+                        const normal = Object.values(dataMap.value.normal)[e.dataIndex];
+                        const abnormal = Object.values(dataMap.value.abnormal)[e.dataIndex];
+                        $modalExportTable.value.showModal(normal.concat(abnormal));
+                    }}
+                />
                 <GupoButton
                     type='primary'
                     onClick={() => {
@@ -204,6 +215,7 @@ export default defineComponent({
                 >
                     导出
                 </GupoButton>
+                <ModalExportTable ref={$modalExportTable} />
             </GupoModal>
         );
         return {
