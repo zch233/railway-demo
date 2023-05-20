@@ -164,13 +164,13 @@ export default defineComponent({
                         .reduce((a, b) => a + b, 0)} 趟（停运 ${Object.values(dataMap.value.abnormal)
                         .map(v => v.filter(v => !v.dateRange))
                         .map(v => v.length)
-                        .reduce((a, b) => a + b, 0)} 躺），临客开行 ${Object.values(dataMap.value.normal)
+                        .reduce((a, b) => a + b, 0)} 趟），临客开行 ${Object.values(dataMap.value.normal)
                         .map(v => v.filter(v => v.dateRange))
                         .map(v => v.length)
-                        .reduce((a, b) => a + b, 0)} 躺（停运 ${Object.values(dataMap.value.abnormal)
+                        .reduce((a, b) => a + b, 0)} 趟（停运 ${Object.values(dataMap.value.abnormal)
                         .map(v => v.filter(v => v.dateRange))
                         .map(v => v.length)
-                        .reduce((a, b) => a + b, 0)} 躺）`}
+                        .reduce((a, b) => a + b, 0)} 趟）`}
                     type='warning'
                     show-icon
                 />
