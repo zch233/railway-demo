@@ -158,7 +158,7 @@ export default defineComponent({
                 title={`今日统计(${params.value.filterOptions?.time})`}
             >
                 <GupoAlert
-                    message={`实际开行 ${params.value.data?.list.length} 趟。其中，固定列车开行 ${Object.values(dataMap.value.normal)
+                    message={`实际开行 ${params.value.data?.list.length} 趟。其中，图定列车开行 ${Object.values(dataMap.value.normal)
                         .map(v => v.filter(v => !v.dateRange))
                         .map(v => v.length)
                         .reduce((a, b) => a + b, 0)} 趟（停运 ${Object.values(dataMap.value.abnormal)
