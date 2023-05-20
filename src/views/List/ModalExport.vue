@@ -49,6 +49,7 @@ export default defineComponent({
                     v.beginDefinition = beginCars.includes(v[3].split('-')[0]) ? '是' : '否';
                 }
             });
+            console.log(dataMap.value);
             chartDataOption.value = {
                 height: 550,
                 colors: ['#91cc75', '#ee6666'],
@@ -79,7 +80,9 @@ export default defineComponent({
                             params.value.filterOptions?.[1] ? `${params.value.filterOptions?.[1]}站` : ''
                         }${params.value.filterOptions?.[6] ? `${params.value.filterOptions?.[6]}站台` : ''}${
                             params.value.filterOptions?.[7] ? `${params.value.filterOptions?.[7]}线` : ''
-                        }运行图${params.value.filterOptions?.custom_begin === '1' ? '（始发车）' : ''}`,
+                        }运行图${params.value.filterOptions?.custom_begin === '1' ? '（始发车）' : ''}${
+                            params.value.filterOptions.custom_temp === '1' ? '（临客）' : ''
+                        }`,
                     },
                     xAxis: {
                         type: 'category',
@@ -155,9 +158,19 @@ export default defineComponent({
                 title={`今日统计(${params.value.filterOptions?.time})`}
             >
                 <GupoAlert
-                    message={`图定开行 ${params.value.data?.list.length} 趟，实际开行 ${Object.values(dataMap.value.normal)
+                    message={`实际开行 ${params.value.data?.list.length} 趟。其中，固定列车开行 ${Object.values(dataMap.value.normal)
+                        .map(v => v.filter(v => !v.dateRange))
                         .map(v => v.length)
-                        .reduce((a, b) => a + b, 0)} 趟`}
+                        .reduce((a, b) => a + b, 0)} 趟（停运 ${Object.values(dataMap.value.abnormal)
+                        .map(v => v.filter(v => !v.dateRange))
+                        .map(v => v.length)
+                        .reduce((a, b) => a + b, 0)} 躺），临客开行 ${Object.values(dataMap.value.normal)
+                        .map(v => v.filter(v => v.dateRange))
+                        .map(v => v.length)
+                        .reduce((a, b) => a + b, 0)} 躺（停运 ${Object.values(dataMap.value.abnormal)
+                        .map(v => v.filter(v => v.dateRange))
+                        .map(v => v.length)
+                        .reduce((a, b) => a + b, 0)} 躺）`}
                     type='warning'
                     show-icon
                 />
