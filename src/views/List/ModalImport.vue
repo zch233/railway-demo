@@ -41,7 +41,12 @@ export default defineComponent({
                         }, {});
                         item.status = '1';
                         return item;
-                    });
+                    })
+                    .sort(
+                        (a, b) =>
+                            new Date(`${dayjs().format('YYYY-MM-DD')} ${a[4] === '=' ? a[5] : a[4]}`).getTime() -
+                            new Date(`${dayjs().format('YYYY-MM-DD')} ${b[4] === '=' ? b[5] : b[4]}`).getTime()
+                    );
                 context.emit('updateDataSource', { list, total: list.length });
                 context.emit('updatePlaces', [...new Set(list.map(v => v[1]))]);
                 context.emit('updatePlatforms', [...new Set(list.map(v => v[6]))]);
