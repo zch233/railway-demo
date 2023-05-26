@@ -8,7 +8,7 @@ import { useStoreApp } from '@src/store/modules/app';
 
 export default defineComponent({
     name: 'ModalImport',
-    emits: ['updateColumns', 'updateDataSource', 'updatePlaces', 'updateWays', 'success'],
+    emits: ['updateColumns', 'updateDataSource', 'updatePlaces', 'updateWays', 'success', 'updatePlatforms'],
     expose: ['showModal'],
     setup(props, context) {
         const appStore = useStoreApp();

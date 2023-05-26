@@ -11,7 +11,6 @@ import { useTable } from '@src/views/List/hooks/useTable';
 export default defineComponent({
     name: 'List',
     setup() {
-        const $globalTable = ref();
         const $modalImport = ref();
         const $modalImportTemp = ref();
         const $modalOrder = ref();
@@ -29,7 +28,7 @@ export default defineComponent({
                 />
                 <ModalImport
                     ref={$modalImport}
-                    onSuccess={() => $globalTable.value.refresh()}
+                    onSuccess={() => refreshTable()}
                     onUpdateColumns={e => setColumns(e)}
                     onUpdateDataSource={e => setDataSource(e)}
                     onUpdatePlaces={e => setPlaces(e)}
