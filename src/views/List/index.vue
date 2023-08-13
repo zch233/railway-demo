@@ -15,8 +15,19 @@ export default defineComponent({
         const $modalImportTemp = ref();
         const $modalOrder = ref();
         const $modalExport = ref();
-        const { Table, setColumns, setDataSource, setPlaces, setPlatforms, setWays, setDataSourceTemp, setSelectedRowKeys, refreshTable, dataSourceTemp } =
-            useTable();
+        const {
+            Table,
+            setColumns,
+            setDataSource,
+            setPlaces,
+            setPlatforms,
+            setPlatformsRules,
+            setWays,
+            setDataSourceTemp,
+            setSelectedRowKeys,
+            refreshTable,
+            dataSourceTemp,
+        } = useTable();
 
         return () => (
             <div class='container'>
@@ -33,6 +44,7 @@ export default defineComponent({
                     onUpdateDataSource={e => setDataSource(e)}
                     onUpdatePlaces={e => setPlaces(e)}
                     onUpdatePlatforms={e => setPlatforms(e)}
+                    onUpdatePlatformsRules={e => setPlatformsRules(e)}
                     onUpdateWays={e => setWays(e)}
                 />
                 <ModalImportTemp

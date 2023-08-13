@@ -50,6 +50,14 @@ export default defineComponent({
                 context.emit('updateDataSource', { list, total: list.length });
                 context.emit('updatePlaces', [...new Set(list.map(v => v[1]))]);
                 context.emit('updatePlatforms', [...new Set(list.map(v => v[6]))]);
+                context.emit(
+                    'updatePlatformsRules',
+                    list.reduce((a, b) => {
+                        a[b[1]] = [...new Set(a[b[1]])] || [];
+                        a[b[1]].push(b[6]);
+                        return a;
+                    }, {})
+                );
                 context.emit('updateWays', [...new Set(list.map(v => v[7]))]);
                 context.emit('success');
                 modal.visible = false;
@@ -94,7 +102,7 @@ export default defineComponent({
                 <GlobalFormItem
                     labelCol={{ span: 0 }}
                     formData={modal.formData}
-                    onUpdate:formData={e => (modal.formData = e)}
+                    onUpdate:formData={e => (modal.formData.clear = e.clear)}
                     item={{
                         key: 'clear',
                         label: '是否清空调令',

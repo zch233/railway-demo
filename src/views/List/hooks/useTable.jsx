@@ -34,6 +34,9 @@ export const useTable = options => {
                 placeholder: '请选择办客站',
                 showSearch: true,
                 options: places.value.map(value => ({ label: value, value })),
+                dataChange(e) {
+                    filterOptions[1] = e[1];
+                },
             },
         },
         {
@@ -49,7 +52,7 @@ export const useTable = options => {
             props: {
                 placeholder: '请选择站台',
                 showSearch: true,
-                options: platforms.value.map(value => ({ label: value, value })),
+                options: platforms.value.map(value => ({ label: value, value, disabled: !platformsRules.value[filterOptions[1]]?.includes(value) })),
             },
         },
         {
@@ -100,6 +103,7 @@ export const useTable = options => {
     ]);
     const places = useLocalStorage('places', []);
     const platforms = useLocalStorage('platforms', []);
+    const platformsRules = useLocalStorage('platformsRules', {});
     const ways = useLocalStorage('ways', []);
     const columns = useLocalStorage('columns', []);
     const dataSource = useLocalStorage('dataSource', { list: [], total: 0 });
@@ -277,6 +281,7 @@ export const useTable = options => {
         setDataSource: e => (dataSource.value = e),
         setPlaces: e => (places.value = e),
         setPlatforms: e => (platforms.value = e),
+        setPlatformsRules: e => (platformsRules.value = e),
         setWays: e => (ways.value = e),
         setDataSourceTemp: e => (dataSourceTemp.value = e),
         setSelectedRowKeys: e => (selectedRowKeys.value = e),

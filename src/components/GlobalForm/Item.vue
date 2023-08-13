@@ -65,8 +65,9 @@ const formatterOperationWrapperCol = computed(() =>
     Object.values(props.operationWrapperCol).length ? props.operationWrapperCol : { offset: props.labelCol.span, span: props.wrapperCol.span }
 );
 
-const updateValue = value => {
+const updateValue = (value, item) => {
     emits('update:formData', value);
+    item.props?.dataChange?.(value);
 };
 
 // 定义单独配置
@@ -149,7 +150,7 @@ const setVisible = value => {
             <component
                 :is="normalComponents[item.type]"
                 :value="formData[item.key]"
-                @update:value="updateValue({ [item.key]: $event })"
+                @update:value="updateValue({ [item.key]: $event }, item)"
                 :allowClear="allowClear"
                 v-bind="generateProps(item) || {}"
             />
@@ -159,7 +160,7 @@ const setVisible = value => {
             <component
                 :is="compositeComponents.select"
                 :value="formData[item.key]"
-                @update:value="updateValue({ [item.key]: $event })"
+                @update:value="updateValue({ [item.key]: $event }, item)"
                 :allowClear="allowClear"
                 v-bind="generateProps(item) || {}"
                 ><template #option="option" v-if="item?.props?.option">
@@ -173,7 +174,7 @@ const setVisible = value => {
             <component
                 :is="compositeComponents.switch"
                 :checked="formData[item.key]"
-                @update:checked="updateValue({ [item.key]: $event })"
+                @update:checked="updateValue({ [item.key]: $event }, item)"
                 v-bind="item?.props || {}"
             />
         </template>
@@ -181,7 +182,7 @@ const setVisible = value => {
             <component
                 :is="compositeComponents.upload"
                 :file-list="formData[item.key]"
-                @update:file-list="updateValue({ [item.key]: $event })"
+                @update:file-list="updateValue({ [item.key]: $event }, item)"
                 v-on="{
                     preview: item.props?.onPreview || handlePreview,
                 }"
@@ -209,7 +210,7 @@ const setVisible = value => {
             <component
                 :is="compositeComponents['upload.dragger']"
                 :file-list="formData[item.key]"
-                @update:file-list="updateValue({ [item.key]: $event })"
+                @update:file-list="updateValue({ [item.key]: $event }, item)"
                 v-bind="item?.props || {}"
                 :maxCount="1"
             >
@@ -228,7 +229,7 @@ const setVisible = value => {
             <component
                 :is="item.component"
                 :modelValue="formData[item.key]"
-                @update:modelValue="updateValue({ [item.key]: $event })"
+                @update:modelValue="updateValue({ [item.key]: $event }, item)"
                 v-bind="item?.props || {}"
             />
         </template>
