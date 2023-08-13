@@ -37,7 +37,7 @@ const names = ref('');
 
 const titleObj = [
     {
-        title: '密码登录',
+        title: '列车实际开行概况辅助分析系统',
         type: 'password',
     },
 ];
@@ -107,7 +107,7 @@ const changeLoginMethod = data => {
 
             .login-area {
                 position: relative;
-                width: 410px;
+                width: 440px;
                 padding: 32px 52px 52px;
                 background: rgba(255, 255, 255, 0.7);
                 box-sizing: border-box;
@@ -149,7 +149,7 @@ const changeLoginMethod = data => {
 
                         &.active {
                             margin-top: 9px;
-                            font-size: 28px;
+                            font-size: 24px;
                             color: #333;
 
                             .line {
