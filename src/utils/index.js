@@ -75,3 +75,11 @@ export const formatDateTime = date => {
 export const isDdOrZzd = () => {
     return getBrowser().versions.dingtalk || getBrowser().versions.taurusapp;
 };
+
+// 判断pc还是移动
+export const isMobile = () => {
+    let userAgentInfo = navigator.userAgent;
+    let Agents = ['Android', 'iPhone', 'SymbianOS', 'Windows Phone', 'iPad', 'iPod'];
+    let getArr = Agents.filter(i => userAgentInfo.includes(i));
+    return !!getArr.length;
+};

@@ -2,6 +2,12 @@ import { createRouter, createWebHashHistory } from 'vue-router';
 
 const routes = [
     {
+        name: 'Login',
+        path: '/login',
+        component: () => import('@src/views/Login/index.vue'),
+        meta: { whiteList: true },
+    },
+    {
         name: 'Redirect',
         path: '/redirect',
         component: () => import('@src/layout/index.vue'),
