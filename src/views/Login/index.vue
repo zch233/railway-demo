@@ -153,7 +153,7 @@ const changeLoginMethod = data => {
                             color: #333;
 
                             .line {
-                                width: 84px;
+                                width: 95%;
                                 height: 4px;
                                 margin: 5px auto 0;
                                 background: #3bb7ff;
