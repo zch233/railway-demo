@@ -165,7 +165,13 @@ export const useTable = options => {
                 />
                 <GlobalTable
                     rowKey='0'
-                    rowSelection={{ selectedRowKeys: selectedRowKeys.value, onChange: e => (selectedRowKeys.value = e) }}
+                    rowSelection={{
+                        selectedRowKeys: selectedRowKeys.value,
+                        preserveSelectedRowKeys: true,
+                        onChange: e => {
+                            selectedRowKeys.value = e;
+                        },
+                    }}
                     onSelectedCancel={() => (selectedRowKeys.value = [])}
                     ref={$globalTable}
                     columns={columns.value
