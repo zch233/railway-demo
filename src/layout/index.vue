@@ -3,7 +3,6 @@ import { computed } from 'vue';
 import { useStoreSetting } from '@src/store/modules/setting';
 import { useStorePermission } from '@src/store/modules/permission.js';
 import Header from './components/Header.vue';
-import Footer from './components/Footer.vue';
 import Breadcrumb from './components/Breadcrumb.vue';
 import Sider from './components/Sider/index.vue';
 import Setting from './Setting/index.vue';
@@ -36,7 +35,6 @@ const include = computed(() => {
                                 </transition>
                             </template>
                         </RouterView>
-                        <Footer />
                     </div>
                 </GupoLayoutContent>
             </GupoLayout>

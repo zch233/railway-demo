@@ -40,7 +40,7 @@ const handelLogoutApi = async () => {
         <div class="header-left">
             <div class="header-left__logo">
                 <img :src="logo" alt="logo" />
-                <span>萧山</span>
+                <span>RAILWAY</span>
             </div>
             <div class="header-left__text">{{ appTitle }}</div>
         </div>
