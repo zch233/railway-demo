@@ -252,10 +252,9 @@ const changeLoginMethod = data => {
 
                         .title-content {
                             margin-bottom: 50px;
-                            font-size: 20px;
 
                             .title.active {
-                                font-size: 24px;
+                                font-size: 20px;
                             }
 
                             .org-name {
