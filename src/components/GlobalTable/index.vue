@@ -104,7 +104,7 @@ const $globalTableOptions = ref();
 
 const defaultMeta = {
     current_page: 1,
-    per_page: props?.pagination?.defaultPageSize || 2,
+    per_page: props?.pagination?.defaultPageSize || 10,
 };
 let meta = reactive({ ...defaultMeta });
 
